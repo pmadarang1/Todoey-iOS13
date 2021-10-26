@@ -37,6 +37,24 @@ class TodoListViewController: UITableViewController { //upadated and changed fro
         return cell
     }
     
+    // MARK: - TableView Delegate Methods
+    
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        //print(array[indexPath.row])
+        
+        //add if statement to add checkmark(accessory) to selected cell or deselect/remove checkmark if it exists
+        if tableView.cellForRow(at: indexPath)?.accessoryType == .checkmark {
+            tableView.cellForRow(at: indexPath)?.accessoryType = .none
+        } else {
+            tableView.cellForRow(at: indexPath)?.accessoryType = .checkmark
+        }
+        
+        //this removes grey 'selected state' and only flashes grey when cell is tapped
+        tableView.deselectRow(at: indexPath, animated: true)
+        
+        
+    }
+    
     
 }
 
