@@ -10,8 +10,8 @@ import UIKit
 
 class TodoListViewController: UITableViewController { //upadated and changed from UIViewController
 
-    //create array to put in to do list
-    let array = ["Find Mike", "Buy Eggos", "Destroy Demogorgon"]
+    //create array to put in to do list...change from let to var to be able to append items to it
+    var array = ["Find Mike", "Buy Eggos", "Destroy Demogorgon"]
     
     
     override func viewDidLoad() {
@@ -55,6 +55,43 @@ class TodoListViewController: UITableViewController { //upadated and changed fro
         
     }
     
+    // MARK: - Add New Items
+    
+    @IBAction func addButtonPressed(_ sender: UIBarButtonItem) {
+        //create local variable for text field so value in text field will be known to action button
+        var textField = UITextField()
+        
+        //add alert with text field to enter item to add to list
+        let alert = UIAlertController(title: "Add New Todoey Item", message: "", preferredStyle: .alert)
+        
+        let action = UIAlertAction(title: "Add Item", style: .default) { (action) in
+            //what will happen once user clicks Add Item Button
+            //print(textField.text ?? "No Text Entered")
+            
+            //add item created in text field and append to list...add validation code later to prevent from adding empty String
+            if textField.hasText {
+                self.array.append(textField.text!)
+                print(self.array)
+                
+                //to add item entered to table cell
+                self.tableView.reloadData()
+            }
+
+            
+
+        }
+        
+        //add text field to alert
+        alert.addTextField { (alertTextField) in
+            alertTextField.placeholder = "Create new item"
+            textField = alertTextField
+        }
+        //add action item(button) to alert
+        alert.addAction(action)
+        
+        //show alert
+        present(alert, animated: true, completion: nil)
+    }
     
 }
 
