@@ -64,9 +64,13 @@ class TodoListViewController: UITableViewController { //upadated and changed fro
         //add alert with text field to enter item to add to list
         let alert = UIAlertController(title: "Add New Todoey Item", message: "", preferredStyle: .alert)
         
+        //add dismiss button
+        let cancel = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
+        
         let action = UIAlertAction(title: "Add Item", style: .default) { (action) in
             //what will happen once user clicks Add Item Button
             //print(textField.text ?? "No Text Entered")
+            
             
             //add item created in text field and append to list...add validation code later to prevent from adding empty String
             if textField.hasText {
@@ -75,9 +79,9 @@ class TodoListViewController: UITableViewController { //upadated and changed fro
                 
                 //to add item entered to table cell
                 self.tableView.reloadData()
+            } else {
+                print("No text entered")
             }
-
-            
 
         }
         
@@ -88,6 +92,8 @@ class TodoListViewController: UITableViewController { //upadated and changed fro
         }
         //add action item(button) to alert
         alert.addAction(action)
+        //add dismiss button
+        alert.addAction(cancel)
         
         //show alert
         present(alert, animated: true, completion: nil)
