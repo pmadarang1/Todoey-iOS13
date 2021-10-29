@@ -16,6 +16,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
+        
+        //add code for UserDefaults to retrieve added item to list after terminating app - will print file path of plist file
+        print(NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true))
+        
         return true
     }
 

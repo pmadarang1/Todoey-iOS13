@@ -13,11 +13,16 @@ class TodoListViewController: UITableViewController { //upadated and changed fro
     //create array to put in to do list...change from let to var to be able to append items to it
     var array = ["Find Mike", "Buy Eggos", "Destroy Demogorgon"]
     
+    //create UserDefaults - Persistent Local Data Storage
+    let defaults = UserDefaults.standard
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        
+        //to load saved data set array = array in user defaults...need to check if nil (put in if let statement)
+        if let items = defaults.array(forKey: "TodoListArray") as? [String] {
+            array = items
+        }
         
     }
 
@@ -75,6 +80,9 @@ class TodoListViewController: UITableViewController { //upadated and changed fro
             //add item created in text field and append to list...add validation code later to prevent from adding empty String
             if textField.hasText {
                 self.array.append(textField.text!)
+                
+                //save new item
+                self.defaults.set(self.array, forKey: "TodoListArray")
                 print(self.array)
                 
                 //to add item entered to table cell
