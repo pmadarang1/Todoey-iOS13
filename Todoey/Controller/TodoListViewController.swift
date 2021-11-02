@@ -11,7 +11,9 @@ import UIKit
 class TodoListViewController: UITableViewController { //upadated and changed from UIViewController
 
     //create array to put in to do list...change from let to var to be able to append items to it
-    var array = ["Find Mike", "Buy Eggos", "Destroy Demogorgon"]
+    //var array = ["Find Mike", "Buy Eggos", "Destroy Demogorgon"]
+    //replace array with array of Item(Data Model)
+    var array = [Item]()
     
     //create UserDefaults - Persistent Local Data Storage
     let defaults = UserDefaults.standard
@@ -19,10 +21,24 @@ class TodoListViewController: UITableViewController { //upadated and changed fro
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        
+        //create instance of Item(Data Model)
+        let newItem = Item()
+        newItem.title = "Find Mike"
+        array.append(newItem)
+        
+        let newItem2 = Item()
+        newItem2.title = "Buy Eggos"
+        array.append(newItem2)
+        
+        let newItem3 = Item()
+        newItem3.title = "Destroy Demogorgon"
+        array.append(newItem3)
+        
         //to load saved data set array = array in user defaults...need to check if nil (put in if let statement)
-        if let items = defaults.array(forKey: "TodoListArray") as? [String] {
-            array = items
-        }
+        //if let items = defaults.array(forKey: "TodoListArray") as? [String] {
+        //    array = items
+        //}
         
     }
 
@@ -37,7 +53,17 @@ class TodoListViewController: UITableViewController { //upadated and changed fro
         
         let cell = tableView.dequeueReusableCell(withIdentifier: "ToDoItemCell", for: indexPath)
         
-        cell.textLabel?.text = arrayItem
+        cell.textLabel?.text = arrayItem.title //added 'title' since array is of type Item and need to tap into title property
+        
+        //add code to display/remove checkmark if user taps on cell
+        if arrayItem.done == true {
+            cell.accessoryType = .checkmark
+        } else {
+            cell.accessoryType = .none
+        }
+        
+        //instead of above code...can use Ternary Operator
+        
         
         return cell
     }
@@ -47,12 +73,19 @@ class TodoListViewController: UITableViewController { //upadated and changed fro
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         //print(array[indexPath.row])
         
+        //add 'done' property from Item(Data Model)
+        array[indexPath.row].done = !array[indexPath.row].done //set 'done' property to opposite value('true')
+        
         //add if statement to add checkmark(accessory) to selected cell or deselect/remove checkmark if it exists
-        if tableView.cellForRow(at: indexPath)?.accessoryType == .checkmark {
-            tableView.cellForRow(at: indexPath)?.accessoryType = .none
-        } else {
-            tableView.cellForRow(at: indexPath)?.accessoryType = .checkmark
-        }
+        //put below code in 'cellForRowAt' to address checkmark reuseable cell bug
+        //if tableView.cellForRow(at: indexPath)?.accessoryType == .checkmark {
+        //    tableView.cellForRow(at: indexPath)?.accessoryType = .none
+        //} else {
+        //    tableView.cellForRow(at: indexPath)?.accessoryType = .checkmark
+        //}
+        
+        //add reloadData() to fix checkmark not displaying
+        tableView.reloadData()
         
         //this removes grey 'selected state' and only flashes grey when cell is tapped
         tableView.deselectRow(at: indexPath, animated: true)
@@ -79,7 +112,11 @@ class TodoListViewController: UITableViewController { //upadated and changed fro
             
             //add item created in text field and append to list...add validation code later to prevent from adding empty String
             if textField.hasText {
-                self.array.append(textField.text!)
+                
+                let newItem = Item()
+                newItem.title = textField.text! //create to tap into Item property (title)
+                
+                self.array.append(newItem)
                 
                 //save new item
                 self.defaults.set(self.array, forKey: "TodoListArray")
