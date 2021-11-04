@@ -28,8 +28,8 @@ class TodoListViewController: UITableViewController { //upadated and changed fro
         print(dataFilePath)
         
         
-        //create instance of Item(Data Model)
-        let newItem = Item()
+        //create instance of Item(Data Model)...no longer needed since already saved in plist with loadItems()
+        /*let newItem = Item()
         newItem.title = "Find Mike"
         array.append(newItem)
         
@@ -39,13 +39,15 @@ class TodoListViewController: UITableViewController { //upadated and changed fro
         
         let newItem3 = Item()
         newItem3.title = "Destroy Demogorgon"
-        array.append(newItem3)
+        array.append(newItem3) */
         
         //USER DEFAULTS - not efficient for saving this data. Will implement another option.
         //to load saved data set array = array in user defaults...need to check if nil (put in if let statement)
         //if let items = defaults.array(forKey: "TodoListArray") as? [Item] {
         //    array = items
         //}
+        
+        loadItems() //method to load saved data in plist
         
     }
 
@@ -132,7 +134,7 @@ class TodoListViewController: UITableViewController { //upadated and changed fro
                 //self.defaults.set(self.array, forKey: "TodoListArray") //replacing user defaults with another method (creating plist file)..see method/function below
                 self.saveItems()
                 
-                print(self.array)
+                //print(self.array)
                 
                 
             } else {
@@ -171,6 +173,22 @@ class TodoListViewController: UITableViewController { //upadated and changed fro
         
         //to add item entered to table cell
         tableView.reloadData()
+    }
+    
+    func loadItems() {
+    
+        if let data = try? Data(contentsOf: dataFilePath!) {
+            
+            let decoder = PropertyListDecoder()
+            
+            do {
+            array = try decoder.decode([Item].self, from: data)
+            }catch {
+                print("Error decoding data, \(error)")
+            }
+        }
+        
+            
     }
 }
 
