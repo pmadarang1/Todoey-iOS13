@@ -15,11 +15,17 @@ class TodoListViewController: UITableViewController { //upadated and changed fro
     //replace array with array of Item(Data Model)
     var array = [Item]()
     
+    //create file path to documents folder...returns array of URLS(need .first)...add plist file to file path
+    let dataFilePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("Items.plist")
+    
     //create UserDefaults - Persistent Local Data Storage
-    let defaults = UserDefaults.standard
+    //let defaults = UserDefaults.standard
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        
+        print(dataFilePath)
         
         
         //create instance of Item(Data Model)
@@ -35,8 +41,9 @@ class TodoListViewController: UITableViewController { //upadated and changed fro
         newItem3.title = "Destroy Demogorgon"
         array.append(newItem3)
         
+        //USER DEFAULTS - not efficient for saving this data. Will implement another option.
         //to load saved data set array = array in user defaults...need to check if nil (put in if let statement)
-        //if let items = defaults.array(forKey: "TodoListArray") as? [String] {
+        //if let items = defaults.array(forKey: "TodoListArray") as? [Item] {
         //    array = items
         //}
         
@@ -85,8 +92,10 @@ class TodoListViewController: UITableViewController { //upadated and changed fro
         //    tableView.cellForRow(at: indexPath)?.accessoryType = .checkmark
         //}
         
+        saveItems()
+        
         //add reloadData() to fix checkmark not displaying
-        tableView.reloadData()
+        //tableView.reloadData() //no need for this since it exists in saveItems()
         
         //this removes grey 'selected state' and only flashes grey when cell is tapped
         tableView.deselectRow(at: indexPath, animated: true)
@@ -120,11 +129,12 @@ class TodoListViewController: UITableViewController { //upadated and changed fro
                 self.array.append(newItem)
                 
                 //save new item
-                self.defaults.set(self.array, forKey: "TodoListArray")
+                //self.defaults.set(self.array, forKey: "TodoListArray") //replacing user defaults with another method (creating plist file)..see method/function below
+                self.saveItems()
+                
                 print(self.array)
                 
-                //to add item entered to table cell
-                self.tableView.reloadData()
+                
             } else {
                 print("No text entered")
             }
@@ -145,5 +155,22 @@ class TodoListViewController: UITableViewController { //upadated and changed fro
         present(alert, animated: true, completion: nil)
     }
     
+    //MARK: - Model Manipulation Methods (save data, etc.)
+    
+    //copied 'encoder' code from addButtonPressed action...solves bug of 'item.done' not saving
+    
+    func saveItems() {
+        let encoder = PropertyListEncoder()
+        do {
+            let data = try encoder.encode(array)
+            try data.write(to: dataFilePath!)
+            
+        } catch {
+            print("Error encoding item array, \(error)")
+        }
+        
+        //to add item entered to table cell
+        tableView.reloadData()
+    }
 }
 
