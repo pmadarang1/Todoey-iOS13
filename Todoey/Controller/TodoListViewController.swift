@@ -56,14 +56,15 @@ class TodoListViewController: UITableViewController { //upadated and changed fro
         cell.textLabel?.text = arrayItem.title //added 'title' since array is of type Item and need to tap into title property
         
         //add code to display/remove checkmark if user taps on cell
-        if arrayItem.done == true {
-            cell.accessoryType = .checkmark
-        } else {
-            cell.accessoryType = .none
-        }
+        //if arrayItem.done == true {
+        //    cell.accessoryType = .checkmark
+        //} else {
+        //    cell.accessoryType = .none
+        //}
         
         //instead of above code...can use Ternary Operator
-        
+        //value = condition ? valueIfTrue : valueIfFalse
+        cell.accessoryType = arrayItem.done == true ? .checkmark : .none
         
         return cell
     }
