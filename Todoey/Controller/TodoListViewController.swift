@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import CoreData
 
 class TodoListViewController: UITableViewController { //upadated and changed from UIViewController
 
@@ -20,6 +21,8 @@ class TodoListViewController: UITableViewController { //upadated and changed fro
     
     //create UserDefaults - Persistent Local Data Storage
     //let defaults = UserDefaults.standard
+    
+    let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext //singleton (same as AppDelegate) need to tap into for 'context'
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -47,7 +50,7 @@ class TodoListViewController: UITableViewController { //upadated and changed fro
         //    array = items
         //}
         
-        loadItems() //method to load saved data in plist
+        //loadItems() //method to load saved data in plist
         
     }
 
@@ -125,8 +128,10 @@ class TodoListViewController: UITableViewController { //upadated and changed fro
             //add item created in text field and append to list...add validation code later to prevent from adding empty String
             if textField.hasText {
                 
-                let newItem = Item()
+                let newItem = Item(context: self.context)  //must update to CoreData DataModel file
                 newItem.title = textField.text! //create to tap into Item property (title)
+                
+                newItem.done = false //set to false by default since it's optional...otherwise it's 'nil' and will give error
                 
                 self.array.append(newItem)
                 
@@ -162,33 +167,33 @@ class TodoListViewController: UITableViewController { //upadated and changed fro
     //copied 'encoder' code from addButtonPressed action...solves bug of 'item.done' not saving
     
     func saveItems() {
-        let encoder = PropertyListEncoder()
+        //let encoder = PropertyListEncoder() //Encoder no longer need for CoreData
         do {
-            let data = try encoder.encode(array)
-            try data.write(to: dataFilePath!)
-            
+            //let data = try encoder.encode(array)
+            //try data.write(to: dataFilePath!)
+            try context.save()
         } catch {
-            print("Error encoding item array, \(error)")
+            print("Error saving context, \(error)")
         }
         
         //to add item entered to table cell
         tableView.reloadData()
     }
     
-    func loadItems() {
-    
-        if let data = try? Data(contentsOf: dataFilePath!) {
-            
-            let decoder = PropertyListDecoder()
-            
-            do {
-            array = try decoder.decode([Item].self, from: data)
-            }catch {
-                print("Error decoding data, \(error)")
-            }
-        }
-        
-            
-    }
+//    func loadItems() {
+//
+//        if let data = try? Data(contentsOf: dataFilePath!) {
+//
+//            let decoder = PropertyListDecoder()
+//
+//            do {
+//            array = try decoder.decode([Item].self, from: data)
+//            }catch {
+//                print("Error decoding data, \(error)")
+//            }
+//        }
+//
+//
+//    }
 }
 
