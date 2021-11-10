@@ -17,7 +17,7 @@ class TodoListViewController: UITableViewController { //upadated and changed fro
     var array = [Item]()
     
     //create file path to documents folder...returns array of URLS(need .first)...add plist file to file path
-    let dataFilePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("Items.plist")
+    //let dataFilePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("Items.plist") //dataFilePath no longer needed for CoreData but need to print file path to locate file
     
     //create UserDefaults - Persistent Local Data Storage
     //let defaults = UserDefaults.standard
@@ -28,8 +28,8 @@ class TodoListViewController: UITableViewController { //upadated and changed fro
         super.viewDidLoad()
         
         
-        print(dataFilePath)
-        
+        //print(dataFilePath)
+        print(FileManager.default.urls(for: .documentDirectory, in: .userDomainMask))
         
         //create instance of Item(Data Model)...no longer needed since already saved in plist with loadItems()
         /*let newItem = Item()
@@ -50,7 +50,7 @@ class TodoListViewController: UITableViewController { //upadated and changed fro
         //    array = items
         //}
         
-        //loadItems() //method to load saved data in plist
+        loadItems() //method to load saved data in plist
         
     }
 
@@ -88,6 +88,12 @@ class TodoListViewController: UITableViewController { //upadated and changed fro
         
         //add 'done' property from Item(Data Model)
         array[indexPath.row].done = !array[indexPath.row].done //set 'done' property to opposite value('true')
+        
+        //code example to "Delete" data from CoreData...remove item when clicked
+
+//        context.delete(array[indexPath.row]) //deletes from CoreData persistent container...call first before below code
+//        array.remove(at: indexPath.row) //only removes cell from current view
+        
         
         //add if statement to add checkmark(accessory) to selected cell or deselect/remove checkmark if it exists
         //put below code in 'cellForRowAt' to address checkmark reuseable cell bug
@@ -180,8 +186,19 @@ class TodoListViewController: UITableViewController { //upadated and changed fro
         tableView.reloadData()
     }
     
-//    func loadItems() {
-//
+    func loadItems() {
+
+        let request : NSFetchRequest<Item> = Item.fetchRequest() //need to specify the data type " : NSFetchRequest<Item>"
+        do {
+            array = try context.fetch(request) //set array to quest Item in saved file
+        } catch {
+            print("Error fetching data from context \(error)")
+        }
+    }
+    
+    
+    
+//        code below will be replaced for CoreData "Read"
 //        if let data = try? Data(contentsOf: dataFilePath!) {
 //
 //            let decoder = PropertyListDecoder()
@@ -195,5 +212,6 @@ class TodoListViewController: UITableViewController { //upadated and changed fro
 //
 //
 //    }
+    
 }
 
