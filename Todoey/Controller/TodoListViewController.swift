@@ -186,14 +186,16 @@ class TodoListViewController: UITableViewController { //upadated and changed fro
         tableView.reloadData()
     }
     
-    func loadItems() {
+    func loadItems(with request: NSFetchRequest<Item> = Item.fetchRequest()) { //give parameter default value so loadItems doesn't have to take a parameter
 
-        let request : NSFetchRequest<Item> = Item.fetchRequest() //need to specify the data type " : NSFetchRequest<Item>"
+        //let request : NSFetchRequest<Item> = Item.fetchRequest() //need to specify the data type " : NSFetchRequest<Item>" //not needed since function already take a parameter with same type
         do {
             array = try context.fetch(request) //set array to quest Item in saved file
         } catch {
             print("Error fetching data from context \(error)")
         }
+        
+        tableView.reloadData()
     }
     
     
@@ -212,6 +214,40 @@ class TodoListViewController: UITableViewController { //upadated and changed fro
 //
 //
 //    }
+    
+    
+}
+
+//MARK: - Extension to add SearchBar Delegate Methods
+
+extension TodoListViewController: UISearchBarDelegate {
+    
+    //method to reload table view after search button is clicked
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        
+        //need to add request to read data being searched
+        let request : NSFetchRequest<Item> = Item.fetchRequest()
+        
+        //add to query data being searched
+        let predicate = NSPredicate(format: "title CONTAINS[cd] %@", searchBar.text!) //[cd] makes search case/diacritic insensitive
+        
+        request.predicate = predicate
+        
+        //sort data that comes back
+        let sortDescriptor = NSSortDescriptor(key: "title", ascending: true)
+        request.sortDescriptors = [sortDescriptor] //make sortDescriptor an array to conform to 'sortDescriptors'
+        
+        
+        //need to fetch data being searched...same as loadItems()
+        loadItems(with: request)
+        
+        //reload tableView
+        //tableView.reloadData() //not needed since it is in loadItems()
+        
+        
+        //what data comes back when user clicks search
+        print(searchBar.text!)
+    }
     
 }
 
