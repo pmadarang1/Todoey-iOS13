@@ -249,5 +249,19 @@ extension TodoListViewController: UISearchBarDelegate {
         print(searchBar.text!)
     }
     
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {  //triggers when text is typed or deleted...goes back to origial list
+        
+        if searchBar.text?.count == 0 {
+            
+            loadItems()
+            
+            //dismiss keyboard...put inside DispatchQueue
+            DispatchQueue.main.async {
+                searchBar.resignFirstResponder()
+            }
+            
+        }
+    }
+    
 }
 
