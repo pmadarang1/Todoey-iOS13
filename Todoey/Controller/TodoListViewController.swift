@@ -126,7 +126,7 @@ class TodoListViewController: UITableViewController { //upadated and changed fro
         //add dismiss button
         let cancel = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
         
-        let action = UIAlertAction(title: "Add Item", style: .default) { (action) in
+        let action = UIAlertAction(title: "Add", style: .default) { (action) in
             //what will happen once user clicks Add Item Button
             //print(textField.text ?? "No Text Entered")
             
