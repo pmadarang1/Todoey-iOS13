@@ -16,6 +16,13 @@ class TodoListViewController: UITableViewController { //upadated and changed fro
     //replace array with array of Item(Data Model)
     var array = [Item]()
     
+    var selectedCategory : Category? {
+        //only triggers when Category gets set with a value(not nil)...call loadItems()--delete from viewDidLoad()
+        didSet {
+            loadItems()
+        }
+    }
+    
     //create file path to documents folder...returns array of URLS(need .first)...add plist file to file path
     //let dataFilePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("Items.plist") //dataFilePath no longer needed for CoreData but need to print file path to locate file
     
@@ -50,7 +57,7 @@ class TodoListViewController: UITableViewController { //upadated and changed fro
         //    array = items
         //}
         
-        loadItems() //method to load saved data in plist
+        //loadItems() //method to load saved data in plist --remove since triggers in Category 'didSet' above
         
     }
 
@@ -139,6 +146,8 @@ class TodoListViewController: UITableViewController { //upadated and changed fro
                 
                 newItem.done = false //set to false by default since it's optional...otherwise it's 'nil' and will give error
                 
+                newItem.parentCategory = self.selectedCategory  //need to assign added item to parentCategory
+                
                 self.array.append(newItem)
                 
                 //save new item
@@ -186,9 +195,21 @@ class TodoListViewController: UITableViewController { //upadated and changed fro
         tableView.reloadData()
     }
     
-    func loadItems(with request: NSFetchRequest<Item> = Item.fetchRequest()) { //give parameter default value so loadItems doesn't have to take a parameter
+    func loadItems(with request: NSFetchRequest<Item> = Item.fetchRequest(), predicate: NSPredicate? = nil) { //give parameter default value so loadItems doesn't have to take a parameter...need extra parameter for search bar predicate
 
         //let request : NSFetchRequest<Item> = Item.fetchRequest() //need to specify the data type " : NSFetchRequest<Item>" //not needed since function already take a parameter with same type
+        
+        //need to filter out selected Category and only load items that matches it..similar to search bar filter
+        let categoryPredicate = NSPredicate(format: "parentCategory.name MATCHES %@", selectedCategory!.name!)
+        
+        if let additionalPredicate = predicate {
+            request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [categoryPredicate, additionalPredicate])
+        } else {
+            request.predicate = categoryPredicate
+        }
+        
+        
+        
         do {
             array = try context.fetch(request) //set array to quest Item in saved file
         } catch {
@@ -238,8 +259,8 @@ extension TodoListViewController: UISearchBarDelegate {
         request.sortDescriptors = [sortDescriptor] //make sortDescriptor an array to conform to 'sortDescriptors'
         
         
-        //need to fetch data being searched...same as loadItems()
-        loadItems(with: request)
+        //need to fetch data being searched...same as loadItems()...added extra parameter predicate to make search bar work with Category
+        loadItems(with: request, predicate: predicate)
         
         //reload tableView
         //tableView.reloadData() //not needed since it is in loadItems()

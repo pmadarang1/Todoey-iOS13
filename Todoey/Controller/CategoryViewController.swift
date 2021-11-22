@@ -122,5 +122,21 @@ class CategoryViewController: UITableViewController {
     
     //MARK: - TableView Delegate Methods
     
-        //leave out for now as part of challenge
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        //when category is selected, segue to ToDoListViewController
+        performSegue(withIdentifier: "goToItems", sender: self)
+    }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        //need to prepare for segue and load only items associated with selected category
+        let destinationVC = segue.destination as! TodoListViewController
+        
+        //get 'Category' that corresponds to the selected cell...can be optional so put in 'if let'
+        if let indexPath = tableView.indexPathForSelectedRow {
+            destinationVC.selectedCategory = array[indexPath.row] //create 'selectedCategory' property in ToDoListViewController
+        }
+        
+        
+    }
+    
 }
