@@ -7,14 +7,17 @@
 //
 
 import UIKit
-import CoreData
+import RealmSwift
 
 class CategoryViewController: UITableViewController {
     
-    var array = [Category]()
+    let realm = try! Realm() //initialize Realm
+    
+    //var array = [Category]()
+    var categories: Results<Category>? //created this to make loadCategories variable valid...make optional and use nil coalescing operator in tableview numberofrowsinsection
     //var array = ["Grocery", "Christmas"]
     
-    let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+    //let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext //not need for Realm
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -29,15 +32,15 @@ class CategoryViewController: UITableViewController {
         //display categories(table cell) in database
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return array.count
+        return categories?.count ?? 1 //array is optional 'Result'
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let arrayItem = array[indexPath.row]
+        let arrayItem = categories?[indexPath.row]
         
         let cell = tableView.dequeueReusableCell(withIdentifier: "CategoryCell", for: indexPath)
         
-        cell.textLabel?.text = arrayItem.name //add .name
+        cell.textLabel?.text = arrayItem?.name ?? "No Categories Added Yet" //add .name...optional so use nil coalescing operator
                 
         return cell
     }
@@ -46,9 +49,11 @@ class CategoryViewController: UITableViewController {
     //MARK: - Data Manipulation Methods
         //methods to save and load data
     
-    func saveCategories() {
+    func save(category: Category) {
         do {
-            try context.save()
+            try realm.write {
+                realm.add(category)
+            }
         } catch {
             print("Error saving context, \(error)")
         }
@@ -56,13 +61,16 @@ class CategoryViewController: UITableViewController {
         tableView.reloadData()
     }
     
-    func loadCategories(with request: NSFetchRequest<Category> = Category.fetchRequest()) { //give parameter default value to loadCategories doesn't have to take a parameter
-
-        do {
-            array = try context.fetch(request) //set array to quest Item in saved file
-        } catch {
-            print("Error fetching data from context \(error)")
-        }
+    func loadCategories() {
+    
+        categories = realm.objects(Category.self) //declare above with type 'Result' to make categories global variable
+        
+        //code below not need...applicable to CoreData only
+        //do {
+        //    array = try context.fetch(request) //set array to quest Item in saved file
+        //} catch {
+        //    print("Error fetching data from context \(error)")
+        //}
         
         tableView.reloadData()
     }
@@ -87,12 +95,12 @@ class CategoryViewController: UITableViewController {
             //add item created in text field and append to list...add validation code later to prevent from adding empty String
             if textField.hasText {
                 
-                let newCategory = Category(context: self.context)  //must update to CoreData DataModel file
+                let newCategory = Category()  //no need for context from CoreData
                 newCategory.name = textField.text! //create to tap into Item property (title)
                                 
-                self.array.append(newCategory)
+                //self.array.append(newCategory) //not needed since 'Results' is an auto updating container
                                 
-                self.saveCategories()
+                self.save(category: newCategory) //need to fix method and remove 'context' from CoreData
                                 
                 
             } else {
@@ -133,7 +141,7 @@ class CategoryViewController: UITableViewController {
         
         //get 'Category' that corresponds to the selected cell...can be optional so put in 'if let'
         if let indexPath = tableView.indexPathForSelectedRow {
-            destinationVC.selectedCategory = array[indexPath.row] //create 'selectedCategory' property in ToDoListViewController
+            destinationVC.selectedCategory = categories?[indexPath.row] //create 'selectedCategory' property in ToDoListViewController...add as optional
         }
         
         

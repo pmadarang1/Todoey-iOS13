@@ -8,6 +8,7 @@
 
 import UIKit
 import CoreData
+import RealmSwift
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -20,6 +21,26 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         //add code for UserDefaults to retrieve added item to list after terminating app - will print file path of plist file
         //print(NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true))
+        
+        //add code to use Realm
+        //let data = Data()
+        //data.name = "Phil"
+        //data.age = 45
+        
+        do {
+            let realm = try Realm()
+            //try realm.write {
+                //realm.add(data)
+            //}
+        } catch {
+            print("Error initializing new Realm, \(error)")
+        }
+        
+        
+        //print location of Realm file
+        print(Realm.Configuration.defaultConfiguration.fileURL)
+        
+        
         
         return true
     }
