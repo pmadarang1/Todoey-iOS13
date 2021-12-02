@@ -8,6 +8,7 @@
 
 import UIKit
 import RealmSwift
+import SwipeCellKit
 
 class CategoryViewController: UITableViewController {
     
@@ -24,6 +25,8 @@ class CategoryViewController: UITableViewController {
         
         
         loadCategories()
+        
+        tableView.rowHeight = 80.0
 
 
     }
@@ -38,9 +41,11 @@ class CategoryViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let arrayItem = categories?[indexPath.row]
         
-        let cell = tableView.dequeueReusableCell(withIdentifier: "CategoryCell", for: indexPath)
+        let cell = tableView.dequeueReusableCell(withIdentifier: "CategoryCell", for: indexPath) as! SwipeTableViewCell
         
         cell.textLabel?.text = arrayItem?.name ?? "No Categories Added Yet" //add .name...optional so use nil coalescing operator
+        
+        cell.delegate = self
                 
         return cell
     }
@@ -147,4 +152,49 @@ class CategoryViewController: UITableViewController {
         
     }
     
+}
+
+//MARK:- SwipeCellKit Delegate Methods
+
+extension CategoryViewController: SwipeTableViewCellDelegate {
+    
+    func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath, for orientation: SwipeActionsOrientation) -> [SwipeAction]? {
+        guard orientation == .right else { return nil }
+
+        let deleteAction = SwipeAction(style: .destructive, title: "Delete") { action, indexPath in
+            // handle action by updating model with deletion - use realm to delete table cell
+            //print("Item Deleted")
+            
+            if let categoryForDeletion = self.categories?[indexPath.row] {
+                
+                do {
+                    try self.realm.write {
+                        self.realm.delete(categoryForDeletion)
+                    }
+                } catch {
+                    print("Error deleting category, \(error)")
+                }
+                
+                //tableView.reloadData() //not needed if method to add 'slide delete all the way' added
+
+            }
+            
+        }
+
+        // customize the action appearance
+        deleteAction.image = UIImage(named: "delete-icon")
+
+        return [deleteAction]
+    }
+    
+    //to make cell slide all the way to delete
+    func tableView(_ tableView: UITableView, editActionsOptionsForRowAt indexPath: IndexPath, for orientation: SwipeActionsOrientation) -> SwipeOptions {
+        var options = SwipeOptions()
+        options.expansionStyle = .destructive
+        //options.transitionStyle = .border
+        return options
+    }
+
+    
+
 }

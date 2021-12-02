@@ -28,7 +28,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         //data.age = 45
         
         do {
-            let realm = try Realm()
+            _ = try Realm()
             //try realm.write {
                 //realm.add(data)
             //}
@@ -38,7 +38,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         
         //print location of Realm file
-        print(Realm.Configuration.defaultConfiguration.fileURL)
+        //print(Realm.Configuration.defaultConfiguration.fileURL)
         
         
         
