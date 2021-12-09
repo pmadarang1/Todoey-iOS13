@@ -13,6 +13,7 @@ import RealmSwift
 class Category: Object {
     
     @objc dynamic var name : String = ""
+    @objc dynamic var color : String = ""
     
     //create relationships similar to CoreData for Category and Item
     

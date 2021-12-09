@@ -8,6 +8,7 @@
 
 import UIKit
 import RealmSwift
+
 //import SwipeCellKit //not needed since using SwipeTableViewController
 
 class CategoryViewController: SwipeTableViewController { //UITableViewController -- removed...will inherit from SwipeTableViewController instead
@@ -25,6 +26,9 @@ class CategoryViewController: SwipeTableViewController { //UITableViewController
         
         
         loadCategories()
+        
+        //remove table separators
+        tableView.separatorStyle = .none
         
         //tableView.rowHeight = 80.0 //move to SwipeTableViewController instead to have item cells same height
 
@@ -46,6 +50,10 @@ class CategoryViewController: SwipeTableViewController { //UITableViewController
         //let cell = tableView.dequeueReusableCell(withIdentifier: "CategoryCell", for: indexPath) as! SwipeTableViewCell
         
         cell.textLabel?.text = arrayItem?.name ?? "No Categories Added Yet" //add .name...optional so use nil coalescing operator
+        
+        //change cell background color
+        cell.backgroundColor = hexToUIColor(hex: categories?[indexPath.row].color ?? "1D9BF6")
+            
         
         //cell.delegate = self
                 
@@ -125,6 +133,9 @@ class CategoryViewController: SwipeTableViewController { //UITableViewController
                 
                 let newCategory = Category()  //no need for context from CoreData
                 newCategory.name = textField.text! //create to tap into Item property (title)
+                
+                //save color hexcode to conver to UIColor
+                newCategory.color = self.randomHex()
                                 
                 //self.array.append(newCategory) //not needed since 'Results' is an auto updating container
                                 
@@ -172,6 +183,35 @@ class CategoryViewController: SwipeTableViewController { //UITableViewController
             destinationVC.selectedCategory = categories?[indexPath.row] //create 'selectedCategory' property in ToDoListViewController...add as optional
         }
         
+        
+    }
+    
+    
+    //MARK: - Generate Random Hex Code Function and Conver to UIColor Methods
+    func randomHex() -> String {
+      let a = ["1","2","3","4","5","6","7","8","9","A","B","C","C","E","F"]
+     
+     var s = ""
+        for _ in 0 ..< 6 {
+            s.append(a.randomElement()!)
+        }
+        return s
+    }
+    
+    func hexToUIColor(hex: String) -> UIColor {
+        
+        if hex.count != 6 {
+            return UIColor.systemGray
+        }
+        
+        var rgbValue: UInt64 = 0
+        Scanner(string: hex).scanHexInt64(&rgbValue)
+        
+        return UIColor(
+            red: CGFloat((rgbValue & 0xFF0000) >> 16) / 255.0,
+            green: CGFloat((rgbValue & 0x00FF00) >> 8) / 255.0,
+            blue: CGFloat(rgbValue & 0x0000FF) / 255.0,
+            alpha: 1.0)
         
     }
     
