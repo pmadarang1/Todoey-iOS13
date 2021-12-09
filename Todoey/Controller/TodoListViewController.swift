@@ -37,9 +37,11 @@ class TodoListViewController: SwipeTableViewController { //UITableViewController
         super.viewDidLoad()
         
         tableView.rowHeight = 80.0
+        
+        tableView.separatorStyle = .none
 
         //print(dataFilePath)
-        print(FileManager.default.urls(for: .documentDirectory, in: .userDomainMask))
+        //print(FileManager.default.urls(for: .documentDirectory, in: .userDomainMask))
         
         //create instance of Item(Data Model)...no longer needed since already saved in plist with loadItems()
         /*let newItem = Item()
@@ -77,6 +79,18 @@ class TodoListViewController: SwipeTableViewController { //UITableViewController
 
         if let item = todoItems?[indexPath.row] {
             cell.textLabel?.text = item.title //added 'title' since array is of type Item and need to tap into title property
+            
+            //get selectedCategory background color and use to fill gradient item cells
+            let categoryBackgroundColor = hexToUIColor(hex: selectedCategory!.color)
+            
+            if let itemColor = categoryBackgroundColor.darker(by: (CGFloat(indexPath.row) / CGFloat(todoItems!.count)) * 100.0) {
+                
+                cell.backgroundColor = itemColor
+                cell.textLabel?.textColor = cell.backgroundColor?.isDarkColor == true ? .white : .black
+            }
+            
+            
+            print("\((CGFloat(indexPath.row) / CGFloat(todoItems!.count)) * 100.0)")
             
             cell.accessoryType = item.done == true ? .checkmark : .none
             
@@ -358,3 +372,38 @@ extension TodoListViewController: UISearchBarDelegate {
 
 }
 
+//MARK: - Extension for UIColor - Gradient Effect
+extension UIColor {
+
+    func lighter(by percentage: CGFloat = 30.0) -> UIColor? {
+        return self.adjust(by: abs(percentage) )
+    }
+
+    func darker(by percentage: CGFloat = 30.0) -> UIColor? {
+        return self.adjust(by: -1 * abs(percentage) )
+    }
+
+    func adjust(by percentage: CGFloat = 30.0) -> UIColor? {
+        var red: CGFloat = 0, green: CGFloat = 0, blue: CGFloat = 0, alpha: CGFloat = 0
+        if self.getRed(&red, green: &green, blue: &blue, alpha: &alpha) {
+            return UIColor(red: min(red + percentage/100, 1.0),
+                           green: min(green + percentage/100, 1.0),
+                           blue: min(blue + percentage/100, 1.0),
+                           alpha: alpha)
+        } else {
+            return nil
+        }
+    }
+}
+
+//MARK: - Extension for UIColor - Lighter/Darket Text
+extension UIColor
+{
+    var isDarkColor: Bool {
+        var r, g, b, a: CGFloat
+        (r, g, b, a) = (0, 0, 0, 0)
+        self.getRed(&r, green: &g, blue: &b, alpha: &a)
+        let lum = 0.2126 * r + 0.7152 * g + 0.0722 * b
+        return  lum < 0.50
+    }
+}

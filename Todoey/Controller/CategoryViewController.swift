@@ -187,33 +187,8 @@ class CategoryViewController: SwipeTableViewController { //UITableViewController
     }
     
     
-    //MARK: - Generate Random Hex Code Function and Conver to UIColor Methods
-    func randomHex() -> String {
-      let a = ["1","2","3","4","5","6","7","8","9","A","B","C","C","E","F"]
-     
-     var s = ""
-        for _ in 0 ..< 6 {
-            s.append(a.randomElement()!)
-        }
-        return s
-    }
     
-    func hexToUIColor(hex: String) -> UIColor {
-        
-        if hex.count != 6 {
-            return UIColor.systemGray
-        }
-        
-        var rgbValue: UInt64 = 0
-        Scanner(string: hex).scanHexInt64(&rgbValue)
-        
-        return UIColor(
-            red: CGFloat((rgbValue & 0xFF0000) >> 16) / 255.0,
-            green: CGFloat((rgbValue & 0x00FF00) >> 8) / 255.0,
-            blue: CGFloat(rgbValue & 0x0000FF) / 255.0,
-            alpha: 1.0)
-        
-    }
+    
     
 }
 
